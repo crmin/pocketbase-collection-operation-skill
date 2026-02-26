@@ -45,6 +45,8 @@
 
 ### For Agent
 
+아래 codeblock을 복사해서 agent에게 전달하세요.
+
 ```markdown
 Follow the instructions located at:
 https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/install.md
