@@ -155,6 +155,12 @@ https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/ma
 
 ### For Human
 
+터미널에서 `scripts/uninstall.sh`를 실행하거나 아래 수동 절차를 직접 수행합니다.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/scripts/uninstall.sh | bash -s -- --lang ko
+```
+
 1. 사용 중인 에이전트와 제거 범위(`global` 또는 `project`)를 확인합니다.
 2. 설치된 스킬 디렉터리(`TARGET_DIR`)를 확인합니다.
 3. `TARGET_DIR/SKILL.md`를 삭제합니다.
