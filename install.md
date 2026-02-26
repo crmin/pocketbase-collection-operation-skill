@@ -66,6 +66,6 @@ head -n 5 "$TARGET_DIR/SKILL.md"
 ## Validation Checklist
 
 - The file exists at `TARGET_DIR/SKILL.md`.
-- Front matter contains `name: pocketbase-collection-operations`.
+- Front matter contains `name: pocketbase-collection-operation`.
 - Installed language matches user choice (`en` or `ko`).
 - User is informed that agent restart/reload may be required.

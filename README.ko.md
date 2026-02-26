@@ -67,8 +67,8 @@ https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/ma
 - 커스텀 에이전트/도구
 
 3. 대상 스킬 디렉터리 확정
-- Codex global 기본 경로: `${CODEX_HOME:-$HOME/.codex}/skills/pocketbase-collection-operations`
-- Codex project 설치 후보 경로: `<PROJECT_ROOT>/.codex/skills/pocketbase-collection-operations`
+- Codex global 기본 경로: `${CODEX_HOME:-$HOME/.codex}/skills/pocketbase-collection-operation`
+- Codex project 설치 후보 경로: `<PROJECT_ROOT>/.codex/skills/pocketbase-collection-operation`
 - Claude Code는 공식 문서 기준으로 global/project 경로를 먼저 확인한 뒤 설치합니다.
   - 문서: [https://code.claude.com/docs/ko/skills](https://code.claude.com/docs/ko/skills)
 - OpenCode는 공식 문서 기준으로 global/project 경로를 먼저 확인한 뒤 설치합니다.
@@ -79,7 +79,7 @@ https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/ma
 
 ```bash
 SOURCE_URL="https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/en/SKILL.md"  # 또는 ko/SKILL.md
-TARGET_DIR="/absolute/path/to/skills/pocketbase-collection-operations"
+TARGET_DIR="/absolute/path/to/skills/pocketbase-collection-operation"
 
 mkdir -p "$TARGET_DIR"
 curl -fsSL "$SOURCE_URL" -o "$TARGET_DIR/SKILL.md"

@@ -67,8 +67,8 @@ Use this section when you want to install the skill manually.
 - Custom agent/tooling
 
 3. Resolve the target skill directory
-- Codex global default: `${CODEX_HOME:-$HOME/.codex}/skills/pocketbase-collection-operations`
-- Codex project default candidate: `<PROJECT_ROOT>/.codex/skills/pocketbase-collection-operations`
+- Codex global default: `${CODEX_HOME:-$HOME/.codex}/skills/pocketbase-collection-operation`
+- Codex project default candidate: `<PROJECT_ROOT>/.codex/skills/pocketbase-collection-operation`
 - Claude Code: check official docs, then use your selected global/project skills directory.
   - Docs: [https://code.claude.com/docs/ko/skills](https://code.claude.com/docs/ko/skills)
 - OpenCode: check official docs, then use your selected global/project skills directory.
@@ -79,7 +79,7 @@ Use this section when you want to install the skill manually.
 
 ```bash
 SOURCE_URL="https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/en/SKILL.md"  # or ko/SKILL.md
-TARGET_DIR="/absolute/path/to/skills/pocketbase-collection-operations"
+TARGET_DIR="/absolute/path/to/skills/pocketbase-collection-operation"
 
 mkdir -p "$TARGET_DIR"
 curl -fsSL "$SOURCE_URL" -o "$TARGET_DIR/SKILL.md"
