@@ -90,6 +90,12 @@ https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/ma
 
 Use this section when you want to install the skill manually.
 
+Run `scripts/install.sh` from your terminal, or perform the manual steps below directly.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/scripts/install.sh | bash -s -- --lang en
+```
+
 1. Choose language
 - English skill source: `https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/en/SKILL.md`
 - Korean skill source: `https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/ko/SKILL.md`

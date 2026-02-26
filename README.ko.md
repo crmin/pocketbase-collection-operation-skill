@@ -90,6 +90,12 @@ https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/ma
 
 수동 설치가 필요할 때 아래 절차를 사용합니다.
 
+터미널에서 `scripts/install.sh`를 실행하거나 아래 수동 절차를 직접 수행합니다.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/scripts/install.sh | bash -s -- --lang ko
+```
+
 1. 언어 선택
 - 영어 스킬 원본: `https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/en/SKILL.md`
 - 한국어 스킬 원본: `https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/ko/SKILL.md`
