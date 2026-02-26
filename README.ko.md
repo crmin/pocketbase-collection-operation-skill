@@ -93,7 +93,7 @@ https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/ma
 터미널에서 `scripts/install.sh`를 실행하거나 아래 수동 절차를 직접 수행합니다.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/scripts/install.sh | bash -s -- --lang ko
+curl -fsSL https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/refs/heads/main/scripts/install.sh | bash -s -- --lang ko
 ```
 
 1. 언어 선택
@@ -158,7 +158,7 @@ https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/ma
 터미널에서 `scripts/uninstall.sh`를 실행하거나 아래 수동 절차를 직접 수행합니다.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/scripts/uninstall.sh | bash -s -- --lang ko
+curl -fsSL https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/refs/heads/main/scripts/uninstall.sh | bash -s -- --lang ko
 ```
 
 1. 사용 중인 에이전트와 제거 범위(`global` 또는 `project`)를 확인합니다.

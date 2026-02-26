@@ -93,7 +93,7 @@ Use this section when you want to install the skill manually.
 Run `scripts/install.sh` from your terminal, or perform the manual steps below directly.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/scripts/install.sh | bash -s -- --lang en
+curl -fsSL https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/refs/heads/main/scripts/install.sh | bash -s -- --lang en
 ```
 
 1. Choose language
@@ -158,7 +158,7 @@ https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/ma
 Run `scripts/uninstall.sh` from your terminal, or perform the manual steps below directly.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/scripts/uninstall.sh | bash -s -- --lang en
+curl -fsSL https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/refs/heads/main/scripts/uninstall.sh | bash -s -- --lang en
 ```
 
 1. Choose your agent and uninstall scope (`global` or `project`).
