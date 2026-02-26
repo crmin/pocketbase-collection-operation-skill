@@ -47,7 +47,7 @@
 
 ```markdown
 Follow the instructions located at:
-[https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/install.md](https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/install.md)
+https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/install.md
 ```
 
 ### For Human
