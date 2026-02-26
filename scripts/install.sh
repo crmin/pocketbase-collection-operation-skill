@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_NAME=$(basename "$0")
 DEFAULT_CODEX_GLOBAL="${CODEX_HOME:-$HOME/.codex}/skills/pocketbase-collection-operation"
 DEFAULT_CODEX_PROJECT="$PWD/.codex/skills/pocketbase-collection-operation"
 
@@ -10,6 +9,7 @@ AGENT=""
 SCOPE=""
 TARGET_DIR=""
 CONFLICT_ACTION=""
+TTY_READY=0
 
 usage() {
   cat <<'USAGE'
@@ -64,6 +64,7 @@ msg() {
       invalid_scope) echo '유효하지 않은 scope 값입니다. 허용값: global, project' ;;
       invalid_lang) echo '유효하지 않은 lang 값입니다. 허용값: en, ko' ;;
       invalid_conflict_action) echo '유효하지 않은 conflict-action 값입니다. 허용값: overwrite, keep' ;;
+      interactive_required) echo '대화형 입력을 위해 터미널(TTY)이 필요합니다. 필수 옵션을 모두 지정해 다시 실행하세요.' ;;
       conflict_detected) echo '기존 파일/디렉터리 충돌이 감지되었습니다.' ;;
       keep_existing) echo '기존 SKILL을 유지하고 설치를 건너뜁니다.' ;;
       installing) echo 'SKILL.md를 설치/업데이트합니다...' ;;
@@ -84,6 +85,7 @@ msg() {
       invalid_scope) echo 'Invalid value for --scope. Allowed: global, project' ;;
       invalid_lang) echo 'Invalid value for --lang. Allowed: en, ko' ;;
       invalid_conflict_action) echo 'Invalid value for --conflict-action. Allowed: overwrite, keep' ;;
+      interactive_required) echo 'A terminal (TTY) is required for interactive prompts. Provide all required options and run again.' ;;
       conflict_detected) echo 'Conflict detected with existing directory/file.' ;;
       keep_existing) echo 'Keeping existing SKILL. Installation skipped.' ;;
       installing) echo 'Installing/updating SKILL.md...' ;;
@@ -95,33 +97,94 @@ msg() {
   fi
 }
 
-validate_lang() {
+is_valid_lang() {
   case "$1" in
-    en|ko) ;;
-    *) show_error_and_exit "$(msg invalid_lang)" ;;
+    en|ko) return 0 ;;
+    *) return 1 ;;
   esac
 }
 
-validate_agent() {
+is_valid_agent() {
   case "$1" in
-    codex|claude-code|open-code|custom) ;;
-    *) show_error_and_exit "$(msg invalid_agent)" ;;
+    codex|claude-code|open-code|custom) return 0 ;;
+    *) return 1 ;;
   esac
 }
 
-validate_scope() {
+is_valid_scope() {
   case "$1" in
-    global|project) ;;
-    *) show_error_and_exit "$(msg invalid_scope)" ;;
+    global|project) return 0 ;;
+    *) return 1 ;;
   esac
 }
 
-validate_conflict_action() {
+is_valid_conflict_action() {
   case "$1" in
-    overwrite|keep) ;;
-    *) show_error_and_exit "$(msg invalid_conflict_action)" ;;
+    overwrite|keep) return 0 ;;
+    *) return 1 ;;
   esac
 }
+
+validate_lang_or_exit() {
+  is_valid_lang "$1" || show_error_and_exit "$(msg invalid_lang)"
+}
+
+validate_agent_or_exit() {
+  is_valid_agent "$1" || show_error_and_exit "$(msg invalid_agent)"
+}
+
+validate_scope_or_exit() {
+  is_valid_scope "$1" || show_error_and_exit "$(msg invalid_scope)"
+}
+
+validate_conflict_action_or_exit() {
+  is_valid_conflict_action "$1" || show_error_and_exit "$(msg invalid_conflict_action)"
+}
+
+interactive_required_error() {
+  show_error_and_exit "$(msg interactive_required)"
+}
+
+ensure_tty_for_prompt() {
+  if [[ "$TTY_READY" -eq 1 ]]; then
+    return 0
+  fi
+
+  if { exec 3<>/dev/tty; } 2>/dev/null; then
+    TTY_READY=1
+    return 0
+  fi
+
+  interactive_required_error
+}
+
+cleanup_tty() {
+  if [[ "$TTY_READY" -eq 1 ]]; then
+    exec 3>&- || true
+  fi
+}
+
+prompt_read() {
+  local __var_name="$1"
+  local prompt_key="$2"
+  local prompt_arg="${3:-}"
+  local value=""
+
+  ensure_tty_for_prompt
+  if [[ -n "$prompt_arg" ]]; then
+    msg "$prompt_key" "$prompt_arg" >&3
+  else
+    msg "$prompt_key" >&3
+  fi
+
+  if ! IFS= read -r value <&3; then
+    interactive_required_error
+  fi
+
+  printf -v "$__var_name" '%s' "$value"
+}
+
+trap cleanup_tty EXIT
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -160,28 +223,32 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-validate_lang "$LANG_CHOICE"
+validate_lang_or_exit "$LANG_CHOICE"
 
 if [[ -n "$AGENT" ]]; then
-  validate_agent "$AGENT"
+  validate_agent_or_exit "$AGENT"
 fi
 if [[ -n "$SCOPE" ]]; then
-  validate_scope "$SCOPE"
+  validate_scope_or_exit "$SCOPE"
 fi
 if [[ -n "$CONFLICT_ACTION" ]]; then
-  validate_conflict_action "$CONFLICT_ACTION"
+  validate_conflict_action_or_exit "$CONFLICT_ACTION"
 fi
 
 while [[ -z "$AGENT" ]]; do
-  msg prompt_agent
-  read -r AGENT
-  validate_agent "$AGENT"
+  prompt_read AGENT prompt_agent
+  if ! is_valid_agent "$AGENT"; then
+    echo "$(msg invalid_agent)" >&2
+    AGENT=""
+  fi
 done
 
 while [[ -z "$SCOPE" ]]; do
-  msg prompt_scope
-  read -r SCOPE
-  validate_scope "$SCOPE"
+  prompt_read SCOPE prompt_scope
+  if ! is_valid_scope "$SCOPE"; then
+    echo "$(msg invalid_scope)" >&2
+    SCOPE=""
+  fi
 done
 
 if [[ -z "$TARGET_DIR" ]]; then
@@ -192,24 +259,22 @@ if [[ -z "$TARGET_DIR" ]]; then
     fi
 
     while true; do
-      msg prompt_target_codex "$DEFAULT_TARGET"
-      read -r TARGET_DIR
+      prompt_read TARGET_DIR prompt_target_codex "$DEFAULT_TARGET"
       if [[ -z "$TARGET_DIR" ]]; then
         TARGET_DIR="$DEFAULT_TARGET"
       fi
       if is_absolute_path "$TARGET_DIR"; then
         break
       fi
-      msg path_must_be_absolute
+      echo "$(msg path_must_be_absolute)" >&2
     done
   else
     while true; do
-      msg prompt_target_custom
-      read -r TARGET_DIR
+      prompt_read TARGET_DIR prompt_target_custom
       if is_absolute_path "$TARGET_DIR"; then
         break
       fi
-      msg path_must_be_absolute
+      echo "$(msg path_must_be_absolute)" >&2
     done
   fi
 else
@@ -231,10 +296,13 @@ fi
 
 if [[ "$CONFLICT" -eq 1 ]]; then
   msg conflict_detected
+
   while [[ -z "$CONFLICT_ACTION" ]]; do
-    msg prompt_conflict
-    read -r CONFLICT_ACTION
-    validate_conflict_action "$CONFLICT_ACTION"
+    prompt_read CONFLICT_ACTION prompt_conflict
+    if ! is_valid_conflict_action "$CONFLICT_ACTION"; then
+      echo "$(msg invalid_conflict_action)" >&2
+      CONFLICT_ACTION=""
+    fi
   done
 
   if [[ "$CONFLICT_ACTION" == "keep" ]]; then
