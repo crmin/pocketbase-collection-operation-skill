@@ -12,6 +12,19 @@ The agent must ask the user all of the following before installing:
 
 Do not assume a path if the user cannot confirm it.
 
+Before writing files, the agent must check:
+- Whether `TARGET_DIR` exists
+- Whether `TARGET_DIR` is non-empty
+- Whether `TARGET_DIR/SKILL.md` already exists
+
+If either conflict condition is true, the agent must ask the user to choose exactly one option:
+- `Overwrite (Update)`
+- `Keep Existing SKILL`
+
+Conflict handling rules:
+- `Overwrite (Update)`: overwrite only `TARGET_DIR/SKILL.md` with the selected language source. Do not delete other files.
+- `Keep Existing SKILL`: skip installation and report that the existing skill was kept.
+
 ## Source URLs
 
 - English skill: `https://raw.githubusercontent.com/crmin/pocketbase-collection-operation-skill/main/en/SKILL.md`
@@ -41,11 +54,14 @@ Do not assume a path if the user cannot confirm it.
 
 1. Determine `SOURCE_URL` from language choice.
 2. Determine `TARGET_DIR` from user-confirmed path.
-3. Create directory and download skill file.
-4. Verify the resulting file.
-5. Tell the user to restart/reload the agent.
+3. Detect conflicts (`TARGET_DIR` non-empty or `TARGET_DIR/SKILL.md` exists).
+4. If conflict exists, ask user to choose `Overwrite (Update)` or `Keep Existing SKILL`.
+5. If user chooses keep, stop and report no changes.
+6. If user chooses overwrite, or no conflict exists, install/update `SKILL.md`.
+7. Verify the resulting file.
+8. Tell the user to restart/reload the agent.
 
-### Command Template
+## Command Template (with conflict branch)
 
 ```bash
 # 1) Set source URL based on language
@@ -54,18 +70,41 @@ SOURCE_URL="https://raw.githubusercontent.com/crmin/pocketbase-collection-operat
 # 2) Set target directory from user-confirmed path
 TARGET_DIR="/absolute/path/to/skills/pocketbase-collection-operation"
 
-# 3) Install
+# 3) Detect conflict
+CONFLICT=0
+if [ -d "$TARGET_DIR" ] && [ -n "$(ls -A "$TARGET_DIR" 2>/dev/null)" ]; then
+  CONFLICT=1
+fi
+if [ -f "$TARGET_DIR/SKILL.md" ]; then
+  CONFLICT=1
+fi
+
+# 4) If conflict exists, get explicit user choice
+# Set ACTION to OVERWRITE or KEEP after asking the user.
+ACTION="OVERWRITE"
+
+if [ "$CONFLICT" -eq 1 ] && [ "$ACTION" = "KEEP" ]; then
+  echo "Keeping existing SKILL. Installation skipped."
+  exit 0
+fi
+
+# 5) Install or update (SKILL.md only)
 mkdir -p "$TARGET_DIR"
 curl -fsSL "$SOURCE_URL" -o "$TARGET_DIR/SKILL.md"
 
-# 4) Verify
+# 6) Verify
 test -f "$TARGET_DIR/SKILL.md" && echo "Installed"
 head -n 5 "$TARGET_DIR/SKILL.md"
 ```
 
 ## Validation Checklist
 
-- The file exists at `TARGET_DIR/SKILL.md`.
+- Conflict detection was executed before writing files.
+- If conflict existed, the user was offered both options:
+  - `Overwrite (Update)`
+  - `Keep Existing SKILL`
+- `Overwrite (Update)` only replaced `TARGET_DIR/SKILL.md`.
+- `Keep Existing SKILL` skipped installation.
 - Front matter contains `name: pocketbase-collection-operation`.
 - Installed language matches user choice (`en` or `ko`).
 - User is informed that agent restart/reload may be required.
